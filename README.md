@@ -46,6 +46,34 @@ The best model (Medical-mT5-large fine-tuned on CodiEsp + mapped corpora) is pub
 
 **[ezotova/medical-mt5-clinical-el-spanish](https://huggingface.co/ezotova/medical-mt5-clinical-el-spanish)**
 
+
+### Single-example inference
+
+```python
+from transformers import AutoConfig, AutoTokenizer, MT5ForConditionalGeneration
+
+model_id = "ezotova/medical-mt5-clinical-el-spanish"
+
+config    = AutoConfig.from_pretrained(model_id)
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+model     = MT5ForConditionalGeneration.from_pretrained(model_id, config=config)
+
+def make_prompt(term, sentence):
+    return f"Genera una definición para el término: {term} - en la frase: {sentence}"
+
+term     = "inestabilidad a la marcha"
+sentence = "El paciente refiere sensación de inestabilidad a la marcha y temblores en las manos."
+
+inputs  = tokenizer(make_prompt(term, sentence), return_tensors="pt")
+outputs = model.generate(**inputs, max_new_tokens=64, num_beams=5, early_stopping=True)
+print(tokenizer.decode(outputs[0], skip_special_tokens=True))
+```
+
+> **Note:** `AutoConfig` must be loaded first and passed to `from_pretrained`. The model was
+> fine-tuned with independent `lm_head` weights, so passing `config` prevents the default
+> `tie_word_embeddings` behaviour from overwriting them.
+
+
 ### Run full test-set evaluation
 
 `evaluate_hf.py` downloads the model automatically and evaluates it on the CodiEsp test set. No training artefacts are required.
@@ -75,32 +103,6 @@ Output files written to `--output_dir`:
 - `<model>_test_scores.tsv` — aggregate ROUGE / BLEU / METEOR / BERTScore / SemScore
 
 If predictions already exist the script skips generation and recomputes scores only.
-
-### Single-example inference
-
-```python
-from transformers import AutoConfig, AutoTokenizer, MT5ForConditionalGeneration
-
-model_id = "ezotova/medical-mt5-clinical-el-spanish"
-
-config    = AutoConfig.from_pretrained(model_id)
-tokenizer = AutoTokenizer.from_pretrained(model_id)
-model     = MT5ForConditionalGeneration.from_pretrained(model_id, config=config)
-
-def make_prompt(term, sentence):
-    return f"Genera una definición para el término: {term} - en la frase: {sentence}"
-
-term     = "inestabilidad a la marcha"
-sentence = "El paciente refiere sensación de inestabilidad a la marcha y temblores en las manos."
-
-inputs  = tokenizer(make_prompt(term, sentence), return_tensors="pt")
-outputs = model.generate(**inputs, max_new_tokens=64, num_beams=5, early_stopping=True)
-print(tokenizer.decode(outputs[0], skip_special_tokens=True))
-```
-
-> **Note:** `AutoConfig` must be loaded first and passed to `from_pretrained`. The model was
-> fine-tuned with independent `lm_head` weights, so passing `config` prevents the default
-> `tie_word_embeddings` behaviour from overwriting them.
 
 ## Setup
 
