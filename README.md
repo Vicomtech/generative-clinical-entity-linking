@@ -3,8 +3,8 @@
 This repository contains the code and data for reproducing the experiments described in the paper:
 
 > **Generative Models for Clinical Entity Linking in Spanish**  
-> [Author(s)]  
-> [Venue / Journal, Year]
+> Elena Zotova, Montse Cuadros and German Rigau  
+> Array, Elsevier, 2026
 
 ## Overview
 
@@ -18,29 +18,27 @@ All approaches are evaluated on the [CodiEsp](https://temu.bsc.es/codiesp/) shar
 
 ## Repository Structure
 
-```
-.
-├── .env                          # Environment variables (copy from .env.example)
-├── requirements.txt
-├── evaluate_hf.py                # ← Evaluate the published HF model on the test set
-├── hf_example.py                 # Minimal single-example inference script
-├── corpus/                       # CodiEsp corpus + mapped corpora
-│   ├── codiesp/                  # Train/dev/test splits with sentence-level annotations
-│   ├── cross_encoder_corpus_codiesp/
-│   ├── mapped_corpora/           # Spanish Mantra, E3C, MedTerm mapped to ICD-10
-│   └── ...
-├── icd_10_es/                    # ICD-10 ontology files (Spanish, 2020)
-├── baselines/
-│   ├── string_match/             # Exact string matching baseline
-│   ├── bi-encoder/               # SapBERT + FAISS retrieval
-│   └── cross-encoder/            # Cross-encoder re-ranking
-├── encoder-decoder/              # mT5 and mBART fine-tuning & evaluation
-├── decoder-only/                 # Llama 3.1-8B fine-tuning & evaluation
-├── eval/                         # Shared evaluation utilities
-├── utils/                        # Shared transformer/FAISS utilities
-├── analysis/                     # Performance aggregation scripts
-└── link_generated/               # Semantic similarity linking for generated outputs
-```
+| Path | Description |
+|------|-------------|
+| `.env` | Environment variables (copy from `.env.example`) |
+| [`requirements.txt`](requirements.txt) | Python dependencies |
+| [`evaluate_hf.py`](evaluate_hf.py) | Evaluate the published HF model on the test set |
+| [`hf_example.py`](hf_example.py) | Minimal single-example inference script |
+| [`corpus/`](corpus/) | CodiEsp corpus + mapped corpora |
+| &nbsp;&nbsp;[`codiesp/`](corpus/codiesp/) | Train/dev/test splits with sentence-level annotations |
+| &nbsp;&nbsp;[`cross_encoder_corpus_codiesp/`](corpus/cross_encoder_corpus_codiesp/) | Cross-encoder training/dev corpus |
+| &nbsp;&nbsp;[`mapped_corpora/`](corpus/mapped_corpora/) | Spanish Mantra, E3C, MedTerm mapped to ICD-10 |
+| [`icd_10_es/`](icd_10_es/) | ICD-10 ontology files (Spanish, 2020) |
+| [`baselines/`](baselines/) | Baseline experiments |
+| &nbsp;&nbsp;[`string_match/`](baselines/string_match/) | Exact string matching baseline |
+| &nbsp;&nbsp;[`bi-encoder/`](baselines/bi-encoder/) | SapBERT + FAISS retrieval |
+| &nbsp;&nbsp;[`cross-encoder/`](baselines/cross-encoder/) | Cross-encoder re-ranking |
+| [`encoder-decoder/`](encoder-decoder/) | mT5 and mBART fine-tuning & evaluation |
+| [`decoder-only/`](decoder-only/) | Llama 3.1-8B fine-tuning & evaluation |
+| [`eval/`](eval/) | Shared evaluation utilities |
+| [`utils/`](utils/) | Shared transformer/FAISS utilities |
+| [`analysis/`](analysis/) | Performance aggregation scripts |
+| [`link_generated/`](link_generated/) | Semantic similarity linking for generated outputs |
 
 ## Best Model — Quick Evaluation
 
@@ -103,6 +101,7 @@ print(tokenizer.decode(outputs[0], skip_special_tokens=True))
 > **Note:** `AutoConfig` must be loaded first and passed to `from_pretrained`. The model was
 > fine-tuned with independent `lm_head` weights, so passing `config` prevents the default
 > `tie_word_embeddings` behaviour from overwriting them.
+
 ## Setup
 
 ### Prerequisites
@@ -142,6 +141,17 @@ python -c "import nltk; nltk.download('punkt'); nltk.download('wordnet')"
 
 3. **GPU selection**: `CUDA_VISIBLE_DEVICES` is also controlled via `.env`. Adjust to match your hardware.
 
+## Training Data
+
+The model was fine-tuned on three Spanish clinical NLP datasets:
+
+| Dataset | Description |
+|---|---|
+| [Biomedical-TeMU/CodiEsp_corpus](https://huggingface.co/datasets/Biomedical-TeMU/CodiEsp_corpus) | CodiEsp shared task corpus — Spanish clinical cases annotated with ICD-10 codes (diagnoses and procedures) |
+| [DrBenchmark/E3C](https://huggingface.co/datasets/DrBenchmark/E3C) | European clinical corpus with entity annotations across multiple languages, including Spanish |
+| [IIC/CT-EBM-SP](https://huggingface.co/datasets/IIC/CT-EBM-SP) | Spanish clinical trial corpus annotated for biomedical entities |
+| [Mantra GSC](https://huggingface.co/datasets/bigbio/mantra_gsc) | Medline abstract titles, drug labels, biomedical patent claims in Spanish |
+
 
 ## Citation
 
@@ -163,9 +173,3 @@ This work is licensed under the [Creative Commons Attribution-NonCommercial 4.0 
 
 You are free to share and adapt the material for non-commercial purposes, provided appropriate credit is given. See the [LICENSE](LICENSE) file for the full terms.
 
-## Acknowledgments
-
-<!-- Add funding, institutions, shared task organizers, etc. -->
-- CodiEsp shared task organizers (BSC)
-- MedProcNER shared task organizers (BSC)
-- LivingNER shared task organizers (BSC)
