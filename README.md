@@ -2,7 +2,7 @@
 
 This repository contains the code and data for reproducing the experiments described in the paper:
 
-> **[Paper Title Here]**  
+> **Generative Models for Clinical Entity Linking in Spanish**  
 > [Author(s)]  
 > [Venue / Journal, Year]
 
@@ -142,94 +142,6 @@ python -c "import nltk; nltk.download('punkt'); nltk.download('wordnet')"
 
 3. **GPU selection**: `CUDA_VISIBLE_DEVICES` is also controlled via `.env`. Adjust to match your hardware.
 
-## Data
-
-### Included in this repository
-
-## Reproducing Experiments
-
-### 1. String Matching Baseline
-
-```bash
-cd baselines/string_match
-python string_match.py
-```
-
-### 2. Bi-Encoder + Cross-Encoder Baseline
-
-```bash
-cd baselines/bi-encoder
-# Step 1: Encode and retrieve with SapBERT + FAISS
-python 01_model_sent_codiesp.py
-
-# Step 2: Evaluate bi-encoder
-python 02_calc_performance.py
-
-# Step 3: Re-rank with cross-encoder
-cd ../cross-encoder
-python 03_cross_encoder_codiesp.py
-```
-
-### 3. Encoder-Decoder (mT5)
-
-```bash
-cd encoder-decoder
-
-# Fine-tune Medical-mT5 with context and mapped corpora (runs 3 seeds in parallel)
-python launch_seeds.py
-
-# Evaluate
-python medical_t5_eval_seeds.py --seeds 42 123 456 --corpus codiesp --part test
-```
-
-### 4. Encoder-Decoder (mBART)
-
-```bash
-cd encoder-decoder
-
-# Fine-tune
-python mbart.py
-
-# Evaluate
-python mbart_eval.py
-```
-
-### 5. LLM (Llama 3.1-8B)
-
-```bash
-cd decoder-only
-
-# Prepare training corpus
-python corpus_llama_context.py
-
-# Fine-tune with LoRA
-python finetune_llama.py
-
-# Evaluate
-python eval_llama.py
-```
-
-### 6. Analysis
-
-```bash
-cd analysis
-
-# Calculate performance metrics
-python calc_performance.py
-
-# Aggregate across seeds
-python calc_mean.py
-```
-
-
-## Training Configuration
-
-## Evaluation Metrics
-
-- **Entity Linking**: Accuracy, Precision, Recall, F1, Recall@K (K ∈ {1, 8, 16, 32, 64, 128})
-- **Definition Generation**: ROUGE-L, BLEU, METEOR, BERTScore
-- **Semantic Similarity**: SemScore (cosine similarity with all-mpnet-base-v2)
-- **Seen vs. Unseen**: Separate evaluation on terms seen/unseen during training
 
 ## Citation
 
